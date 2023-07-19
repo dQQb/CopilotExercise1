@@ -1,16 +1,16 @@
 // Create web serer
 // Import Express
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
+const router = Router();
 // Import model
-const Comment = require('../models/comment');
+import { create, findById } from '../models/comment';
 // Import middleware
-const middleware = require('../middleware');
+import { isLoggedIn, checkCommentOwnership } from '../middleware';
 //==================================
 // COMMENT ROUTES
 //==================================
 // New comment form
-router.get('/campgrounds/:id/comments/new', middleware.isLoggedIn, (req, res) => {
+router.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
     // Find campground by id
     Campground.findById(req.params.id, (err, campground) => {
         if (err) {
@@ -22,7 +22,7 @@ router.get('/campgrounds/:id/comments/new', middleware.isLoggedIn, (req, res) =>
     });
 });
 // Create comment
-router.post('/campgrounds/:id/comments', middleware.isLoggedIn, (req, res) => {
+router.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
     // Find campground by id
     Campground.findById(req.params.id, (err, campground) => {
         if (err) {
@@ -31,7 +31,7 @@ router.post('/campgrounds/:id/comments', middleware.isLoggedIn, (req, res) => {
             res.redirect('/campgrounds');
         } else {
             // Create comment
-            Comment.create(req.body.comment, (err, comment) => {
+            create(req.body.comment, (err, comment) => {
                 if (err) {
                     console.log(err);
                 } else {
@@ -52,7 +52,7 @@ router.post('/campgrounds/:id/comments', middleware.isLoggedIn, (req, res) => {
     });
 });
 // Edit comment form
-router.get('/campgrounds/:id/comments/:comment_id/edit', middleware.checkCommentOwnership, (req, res) => {
+router.get('/campgrounds/:id/comments/:comment_id/edit', checkCommentOwnership, (req, res) => {
     // Find campground by id
     Campground.findById(req.params.id, (err, foundCampground) => {
         if (err || !foundCampground) {
@@ -60,7 +60,7 @@ router.get('/campgrounds/:id/comments/:comment_id/edit', middleware.checkComment
             return res.redirect('back');
         }
         // Find comment by id
-        Comment.findById(req.params.comment_id, (err, foundComment) => {
+        findById(req.params.comment_id, (err, foundComment) => {
             if (err) {
                 res.redirect('back');
             } else {
